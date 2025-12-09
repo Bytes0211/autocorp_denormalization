@@ -1,0 +1,32 @@
+                                                                        Table "public.sales_order"
+     Column     |            Type             | Collation | Nullable |                    Default                    | Storage  | Compression | Stats target | Description 
+----------------+-----------------------------+-----------+----------+-----------------------------------------------+----------+-------------+--------------+-------------
+ order_id       | integer                     |           | not null | nextval('sales_order_order_id_seq'::regclass) | plain    |             |              | 
+ customer_id    | integer                     |           | not null |                                               | plain    |             |              | 
+ order_date     | timestamp without time zone |           | not null | CURRENT_TIMESTAMP                             | plain    |             |              | 
+ invoice_number | character varying(50)       |           | not null |                                               | extended |             |              | 
+ payment_method | character varying(50)       |           |          |                                               | extended |             |              | 
+ subtotal       | numeric(12,2)               |           |          |                                               | main     |             |              | 
+ tax            | numeric(12,2)               |           |          | 0.00                                          | main     |             |              | 
+ total_amount   | numeric(12,2)               |           | not null |                                               | main     |             |              | 
+ order_type     | character varying(20)       |           |          |                                               | extended |             |              | 
+ status         | character varying(50)       |           |          | 'Completed'::character varying                | extended |             |              | 
+ notes          | text                        |           |          |                                               | extended |             |              | 
+ created_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP                             | plain    |             |              | 
+ updated_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP                             | plain    |             |              | 
+Indexes:
+    "sales_order_pkey" PRIMARY KEY, btree (order_id)
+    "idx_sales_order_customer" btree (customer_id)
+    "idx_sales_order_date" btree (order_date)
+    "idx_sales_order_invoice" btree (invoice_number)
+    "idx_sales_order_status" btree (status)
+    "sales_order_invoice_number_key" UNIQUE CONSTRAINT, btree (invoice_number)
+Check constraints:
+    "sales_order_order_type_check" CHECK (order_type::text = ANY (ARRAY['Parts'::character varying, 'Service'::character varying, 'Mixed'::character varying]::text[]))
+Foreign-key constraints:
+    "fk_sales_order_customer" FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+Referenced by:
+    TABLE "sales_order_parts" CONSTRAINT "sales_order_parts_order_id_fkey" FOREIGN KEY (order_id) REFERENCES sales_order(order_id) ON DELETE CASCADE
+    TABLE "sales_order_services" CONSTRAINT "sales_order_services_order_id_fkey" FOREIGN KEY (order_id) REFERENCES sales_order(order_id) ON DELETE CASCADE
+Access method: heap
+
